@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  ✨ <strong>New Features</strong>: Weight-based font sizing, HSL color gradients (cool to warm), and object format support
+  ✨ <strong>New Features</strong>: Weight-based font sizing, HSL color gradients, object format support, rectangular layouts, auto-sizing
 </p>
 
 - [Usage](#usage)
@@ -331,6 +331,52 @@ TagCloud(container, texts, {
 });
 ```
 
+##### options.width
+
+Type: `Number` or `null`\
+Default: `null`\
+Unit: `px`
+
+Specify container width. If `null`, will automatically use parent container's width.
+
+##### options.height
+
+Type: `Number` or `null`\
+Default: `null`\
+Unit: `px`
+
+Specify container height. If `null`, will automatically use parent container's height.
+
+##### options.autoResize
+
+Type: `Boolean`\
+Default: `true`
+
+Enable automatic resizing functionality. When enabled, the tag cloud will automatically recalculate layout when parent container size changes. Supports rectangular layouts (aspect ratio other than 1:1).
+
+**Examples:**
+
+```javascript
+// Auto-adapt to parent container size (rectangular layout supported)
+TagCloud('#container', texts, {
+    // width and height will be auto-detected from parent
+    autoResize: true
+});
+
+// Fixed size rectangular layout
+TagCloud('#container', texts, {
+    width: 600,
+    height: 300,
+    autoResize: false
+});
+
+// Responsive square layout
+TagCloud('#container', texts, {
+    width: 400,
+    height: 400,
+    autoResize: true
+});
+```
 
 ## Instance
 

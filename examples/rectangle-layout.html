@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TagCloud 矩形布局示例</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .demo {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .demo h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+            font-size: 1.3em;
+        }
+
+        .demo-description {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* 不同尺寸的容器 */
+        .square-container {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+        }
+
+        .wide-container {
+            width: 400px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        .tall-container {
+            width: 200px;
+            height: 350px;
+            margin: 0 auto;
+        }
+
+        .responsive-container {
+            width: 400px;
+            height: 250px;
+            margin: 0 auto;
+            resize: both;
+            overflow: auto;
+            border: 2px dashed #ddd;
+            min-width: 200px;
+            min-height: 150px;
+            max-width: 800px;
+            max-height: 600px;
+        }
+
+        .tagcloud {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .tagcloud--item {
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+        }
+
+        .tagcloud--item:hover {
+            color: #007bff;
+            transform: scale(1.1);
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .resize-info {
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .square-container,
+            .wide-container,
+            .tall-container {
+                width: 100%;
+                max-width: 300px;
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏷️ TagCloud 矩形布局示例</h1>
+        <p>支持自动适应容器尺寸的3D标签云，可以是正方形、矩形或任意比例</p>
+    </div>
+
+    <div class="container">
+        <div class="demo">
+            <h3>正方形布局 (300×300)</h3>
+            <div class="demo-description">传统的正方形布局，经典的球形分布</div>
+            <div class="square-container">
+                <div id="tagcloud1"></div>
+            </div>
+        </div>
+
+        <div class="demo">
+            <h3>宽矩形布局 (400×200)</h3>
+            <div class="demo-description">宽屏布局，椭圆形分布适应宽屏显示</div>
+            <div class="wide-container">
+                <div id="tagcloud2"></div>
+            </div>
+        </div>
+
+        <div class="demo">
+            <h3>高矩形布局 (200×350)</h3>
+            <div class="demo-description">竖屏布局，椭圆形分布适应竖屏显示</div>
+            <div class="tall-container">
+                <div id="tagcloud3"></div>
+            </div>
+        </div>
+
+        <div class="demo">
+            <h3>可调整大小布局</h3>
+            <div class="demo-description">拖拽右下角调整大小，观察自动适应效果</div>
+            <div class="responsive-container">
+                <div id="tagcloud4"></div>
+            </div>
+            <div class="resize-info">💡 拖拽右下角可以调整容器大小</div>
+        </div>
+    </div>
+
+    <script src="../dist/tagcloud-hls.js"></script>
+    <script>
+        // 共同的标签数据
+        const techTags = [
+            {text: 'JavaScript', pr: 10},
+            {text: 'React', pr: 9},
+            {text: 'Vue.js', pr: 8},
+            {text: 'Node.js', pr: 8},
+            {text: 'TypeScript', pr: 7},
+            {text: 'Python', pr: 7},
+            {text: 'CSS3', pr: 6},
+            {text: 'HTML5', pr: 6},
+            {text: 'Angular', pr: 5},
+            {text: 'Webpack', pr: 5},
+            {text: 'Docker', pr: 4},
+            {text: 'MongoDB', pr: 4},
+            {text: 'Redis', pr: 3},
+            {text: 'GraphQL', pr: 3},
+            {text: 'Sass', pr: 2},
+            {text: 'Jest', pr: 2}
+        ];
+
+        // 共同的配置
+        const commonConfig = {
+            maxSpeed: 'normal',
+            initSpeed: 'normal',
+            direction: 135,
+            keep: true,
+            minFontSize: 12,
+            maxFontSize: 20,
+            hls: true,
+            autoResize: true
+        };
+
+        // 创建不同布局的标签云
+
+        // 1. 正方形布局 - 父容器已设置固定尺寸
+        TagCloud('#tagcloud1', techTags, {
+            ...commonConfig,
+            // 不设置width和height，让它自动使用父容器尺寸
+        });
+
+        // 2. 宽矩形布局 - 父容器已设置固定尺寸
+        TagCloud('#tagcloud2', techTags, {
+            ...commonConfig,
+            direction: 90, // 不同的初始方向
+        });
+
+        // 3. 高矩形布局 - 父容器已设置固定尺寸
+        TagCloud('#tagcloud3', techTags, {
+            ...commonConfig,
+            direction: 45, // 不同的初始方向
+        });
+
+        // 4. 可调整大小布局 - 支持动态调整
+        TagCloud('#tagcloud4', techTags, {
+            ...commonConfig,
+            direction: 180,
+        });
+
+        // 演示动态更新功能
+        let updateCounter = 0;
+        setInterval(() => {
+            updateCounter++;
+
+            // 每10秒更新一次第四个标签云的内容
+            if (updateCounter % 10 === 0) {
+                const newTags = techTags.map(tag => ({
+                    ...tag,
+                    pr: Math.floor(Math.random() * 10) + 1 // 随机权重
+                }));
+
+                // 获取第四个标签云实例并更新
+                const instances = TagCloud.list;
+                if (instances.length > 3) {
+                    instances[3].instance.update(newTags);
+                }
+            }
+        }, 1000);
+
+        // 添加一些交互提示
+        console.log('🎉 TagCloud 矩形布局示例已加载');
+        console.log('💡 尝试调整可调整大小的容器来看自动适应效果');
+        console.log('🔄 第四个标签云会每10秒自动更新权重');
+    </script>
+</body>
+</html>

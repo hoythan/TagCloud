@@ -17,8 +17,11 @@ class TagCloud {
         // process texts and calculate weight range
         self._processTexts();
 
-        // calculate config
-        self.radius = self.config.radius; // rolling radius
+        // calculate container dimensions
+        self._calculateDimensions();
+
+        // calculate config based on container dimensions
+        self.radius = Math.min(self.containerWidth, self.containerHeight) / 2; // rolling radius based on smaller dimension
         self.depth = 2 * self.radius; // rolling depth
         self.size = 1.5 * self.radius; // rolling area size with mouse
         self.maxSpeed = TagCloud._getMaxSpeed(self.config.maxSpeed); // rolling max speed
@@ -41,7 +44,9 @@ class TagCloud {
 
     // default config
     static _defaultConfig = {
-        radius: 100, // rolling radius, unit `px`
+        radius: 100, // rolling radius, unit `px` (deprecated, will be calculated from container size)
+        width: null, // container width, if null will use parent container width
+        height: null, // container height, if null will use parent container height
         maxSpeed: 'normal', // rolling max speed, optional: `slow`, `normal`(default), `fast`
         initSpeed: 'normal', // rolling init speed, optional: `slow`, `normal`(default), `fast`
         direction: 135, // rolling init direction, unit clockwise `deg`, optional: `0`(top) , `90`(left), `135`(right-bottom)(default)...
@@ -55,6 +60,7 @@ class TagCloud {
         minFontSize: 12, // minimum font size in px
         maxFontSize: 12, // maximum font size in px
         hls: false, // whether to use HSL color based on weight
+        autoResize: true, // whether to automatically resize when container size changes
     };
 
     // speed value
@@ -99,6 +105,31 @@ class TagCloud {
         const lightness = 65 - ratio * 30; // 65% → 35%
 
         return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+
+    // calculate container dimensions
+    _calculateDimensions() {
+        const self = this;
+
+        // Get dimensions from config first, then fallback to parent container
+        if (self.config.width && self.config.height) {
+            self.containerWidth = self.config.width;
+            self.containerHeight = self.config.height;
+        } else {
+            // Get parent container computed style
+            const containerStyle = window.getComputedStyle(self.$container);
+            const containerWidth = self.$container.clientWidth
+                || parseInt(containerStyle.width, 10)
+                || self.config.width
+                || 300; // fallback default
+            const containerHeight = self.$container.clientHeight
+                || parseInt(containerStyle.height, 10)
+                || self.config.height
+                || 300; // fallback default
+
+            self.containerWidth = containerWidth;
+            self.containerHeight = containerHeight;
+        }
     }
 
     // process texts data and calculate weight range
@@ -147,8 +178,8 @@ class TagCloud {
         $el.className = self.config.containerClass;
         if (self.config.useContainerInlineStyles) {
             $el.style.position = 'relative';
-            $el.style.width = `${2 * self.radius}px`;
-            $el.style.height = `${2 * self.radius}px`;
+            $el.style.width = `${self.containerWidth}px`;
+            $el.style.height = `${self.containerHeight}px`;
         }
 
         // create texts
@@ -215,12 +246,18 @@ class TagCloud {
         const textsLength = self.processedTexts.length;
         // if random `true`, It means that a random appropriate place is generated, and the position will be independent of `index`
         if (random) index = Math.floor(Math.random() * (textsLength + 1));
+        // Calculate ellipsoid distribution based on container dimensions
         const phi = Math.acos(-1 + (2 * index + 1) / textsLength);
         const theta = Math.sqrt((textsLength + 1) * Math.PI) * phi;
+
+        // Scale factors for ellipsoid shape
+        const scaleX = self.containerWidth / (2 * self.radius);
+        const scaleY = self.containerHeight / (2 * self.radius);
+        const scaleZ = 1; // keep Z axis as sphere for depth effect
         return {
-            x: (self.size * Math.cos(theta) * Math.sin(phi)) / 2,
-            y: (self.size * Math.sin(theta) * Math.sin(phi)) / 2,
-            z: (self.size * Math.cos(phi)) / 2,
+            x: (self.size * Math.cos(theta) * Math.sin(phi) * scaleX) / 2,
+            y: (self.size * Math.sin(theta) * Math.sin(phi) * scaleY) / 2,
+            z: (self.size * Math.cos(phi) * scaleZ) / 2,
         };
     }
 
@@ -275,6 +312,115 @@ class TagCloud {
         self.interval = self._requestInterval(() => {
             self._next.call(self);
         }, 10);
+
+        // setup auto resize observer if enabled
+        if (self.config.autoResize) {
+            self._setupResizeObserver();
+        }
+    }
+
+    // setup resize observer to watch container size changes
+    _setupResizeObserver() {
+        const self = this;
+
+        // Check if ResizeObserver is supported
+        if (typeof window.ResizeObserver !== 'undefined') {
+            self.resizeObserver = new window.ResizeObserver((entries) => {
+                for (const entry of entries) {
+                    if (entry.target === self.$container) {
+                        const newWidth = entry.contentRect.width
+                            || self.$container.clientWidth;
+                        const newHeight = entry.contentRect.height
+                            || self.$container.clientHeight;
+
+                        // Only resize if dimensions actually changed
+                        const widthChanged = newWidth !== self.containerWidth;
+                        const heightChanged = newHeight !== self.containerHeight;
+                        if (widthChanged || heightChanged) {
+                            self._handleResize(newWidth, newHeight);
+                        }
+                    }
+                }
+            });
+
+            self.resizeObserver.observe(self.$container);
+        } else {
+            // Fallback to window resize event for older browsers
+            TagCloud._on(window, 'resize', () => {
+                const newWidth = self.$container.clientWidth;
+                const newHeight = self.$container.clientHeight;
+                const widthChanged = newWidth !== self.containerWidth;
+                const heightChanged = newHeight !== self.containerHeight;
+                if (widthChanged || heightChanged) {
+                    self._handleResize(newWidth, newHeight);
+                }
+            });
+        }
+    }
+
+    // handle container resize
+    _handleResize(newWidth, newHeight) {
+        const self = this;
+
+        // Add minimum change threshold to prevent tiny fluctuations
+        const minChangeThreshold = 1; // 1px minimum change
+        const widthDiff = Math.abs(newWidth - self.containerWidth);
+        const heightDiff = Math.abs(newHeight - self.containerHeight);
+
+        if (widthDiff < minChangeThreshold && heightDiff < minChangeThreshold) {
+            return; // Skip if change is too small
+        }
+
+        // Add debouncing to prevent rapid successive calls
+        if (self._resizeTimeout) {
+            clearTimeout(self._resizeTimeout);
+        }
+
+        self._resizeTimeout = setTimeout(() => {
+            self._performResize(newWidth, newHeight);
+            self._resizeTimeout = null;
+        }, 16); // ~60fps debouncing
+    }
+
+    // perform the actual resize operation
+    _performResize(newWidth, newHeight) {
+        const self = this;
+
+        // Update container dimensions
+        self.containerWidth = newWidth;
+        self.containerHeight = newHeight;
+
+        // Recalculate radius and size based on new dimensions
+        self.radius = Math.min(self.containerWidth, self.containerHeight) / 2;
+        self.depth = 2 * self.radius;
+        self.size = 1.5 * self.radius;
+
+        // Only update TagCloud element size if it won't affect parent container
+        // Avoid setting size on TagCloud element if parent container size is auto
+        if (self.config.useContainerInlineStyles) {
+            // Check if we should update the element size
+            const parentStyle = window.getComputedStyle(self.$container);
+            const parentHasFixedWidth = parentStyle.width !== 'auto'
+                && !parentStyle.width.includes('%');
+            const parentHasFixedHeight = parentStyle.height !== 'auto'
+                && !parentStyle.height.includes('%');
+
+            // Only set dimensions if parent has fixed size to prevent feedback loops
+            if (parentHasFixedWidth || self.config.width) {
+                self.$el.style.width = `${self.containerWidth}px`;
+            }
+            if (parentHasFixedHeight || self.config.height) {
+                self.$el.style.height = `${self.containerHeight}px`;
+            }
+        }
+
+        // Recalculate all item positions
+        self.items.forEach((item, index) => {
+            const newPosition = self._computePosition(index);
+            item.x = newPosition.x;
+            item.y = newPosition.y;
+            item.z = newPosition.z;
+        });
     }
 
     // calculate the next state
@@ -402,6 +548,19 @@ class TagCloud {
     destroy() {
         const self = this;
         self.interval = null;
+
+        // cleanup resize observer
+        if (self.resizeObserver) {
+            self.resizeObserver.disconnect();
+            self.resizeObserver = null;
+        }
+
+        // cleanup resize timeout
+        if (self._resizeTimeout) {
+            clearTimeout(self._resizeTimeout);
+            self._resizeTimeout = null;
+        }
+
         // clear in TagCloud.list
         const index = TagCloud.list.findIndex(e => e.el === self.$el);
         if (index !== -1) TagCloud.list.splice(index, 1);

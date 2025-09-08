@@ -1,7 +1,7 @@
 /*!
- * tagcloud-hls v1.1.0
- * Copyright (c) 2016-2025 @ Hoyt
- * MIT License - https://github.com/hoyt/tagcloud-hls
+ * TagCloud.js v2.5.0
+ * Copyright (c) 2016-2025 @ Cong Min
+ * MIT License - https://github.com/mcc108/TagCloud
  */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
