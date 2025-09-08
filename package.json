@@ -1,9 +1,9 @@
 {
   "name": "tagcloud-hls",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "3D TagCloud with HLS color support - A 3D interactive tag cloud library with weight-based font sizing and HSL color gradients",
-  "main": "dist/TagCloud.js",
-  "types": "dist/TagCloud.d.ts",
+  "main": "dist/tagcloud-hls.js",
+  "types": "dist/tagcloud-hls.d.ts",
   "files": [
     "src",
     "dist"

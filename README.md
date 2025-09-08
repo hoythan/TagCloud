@@ -111,7 +111,7 @@ TagCloud(container, textsWithWeights, options);
 
 ```html
 <!-- html -->
-<script type="text/javascript" src="./dist/TagCloud.min.js"></script>
+<script type="text/javascript" src="./dist/tagcloud-hls.min.js"></script>
 ```
 
 ```js

@@ -9,18 +9,18 @@ import merge from 'lodash/merge';
 const { version } = require('./package.json');
 
 const banner = '/*!\n'
-    + ` * TagCloud.js v${version}\n`
-    + ` * Copyright (c) 2016-${new Date().getFullYear()} @ Cong Min\n`
-    + ' * MIT License - https://github.com/mcc108/TagCloud\n'
+    + ` * tagcloud-hls v${version}\n`
+    + ` * Copyright (c) 2016-${new Date().getFullYear()} @ Hoyt\n`
+    + ' * MIT License - https://github.com/hoyt/tagcloud-hls\n'
     + ' */';
 
 export default [{
     output: {
-        file: 'dist/TagCloud.js',
+        file: 'dist/tagcloud-hls.js',
     },
 }, {
     output: {
-        file: 'dist/TagCloud.min.js',
+        file: 'dist/tagcloud-hls.min.js',
     },
     plugins: [
         uglify({ output: { comments: /^!/ } }),
