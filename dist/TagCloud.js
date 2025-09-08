@@ -1,6 +1,6 @@
 /*!
  * TagCloud.js v2.5.0
- * Copyright (c) 2016-2024 @ Cong Min
+ * Copyright (c) 2016-2025 @ Cong Min
  * MIT License - https://github.com/mcc108/TagCloud
  */
 (function (global, factory) {
@@ -9,6 +9,51 @@
   (global = global || self, global.TagCloud = factory());
 }(this, (function () { 'use strict';
 
+  function _arrayLikeToArray(r, a) {
+    (null == a || a > r.length) && (a = r.length);
+    for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+    return n;
+  }
+  function _arrayWithoutHoles(r) {
+    if (Array.isArray(r)) return _arrayLikeToArray(r);
+  }
+  function _classCallCheck(a, n) {
+    if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function");
+  }
+  function _defineProperties(e, r) {
+    for (var t = 0; t < r.length; t++) {
+      var o = r[t];
+      o.enumerable = o.enumerable || !1, o.configurable = !0, "value" in o && (o.writable = !0), Object.defineProperty(e, _toPropertyKey(o.key), o);
+    }
+  }
+  function _createClass(e, r, t) {
+    return r && _defineProperties(e.prototype, r), t && _defineProperties(e, t), Object.defineProperty(e, "prototype", {
+      writable: !1
+    }), e;
+  }
+  function _defineProperty(e, r, t) {
+    return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
+      value: t,
+      enumerable: !0,
+      configurable: !0,
+      writable: !0
+    }) : e[r] = t, e;
+  }
+  function _extends() {
+    return _extends = Object.assign ? Object.assign.bind() : function (n) {
+      for (var e = 1; e < arguments.length; e++) {
+        var t = arguments[e];
+        for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]);
+      }
+      return n;
+    }, _extends.apply(null, arguments);
+  }
+  function _iterableToArray(r) {
+    if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
+  }
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
   function ownKeys(e, r) {
     var t = Object.keys(e);
     if (Object.getOwnPropertySymbols) {
@@ -30,69 +75,38 @@
     }
     return e;
   }
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
+  function _toConsumableArray(r) {
+    return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
   }
-  function _defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor);
-    }
-  }
-  function _createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) _defineProperties(Constructor, staticProps);
-    Object.defineProperty(Constructor, "prototype", {
-      writable: false
-    });
-    return Constructor;
-  }
-  function _defineProperty(obj, key, value) {
-    key = _toPropertyKey(key);
-    if (key in obj) {
-      Object.defineProperty(obj, key, {
-        value: value,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      });
-    } else {
-      obj[key] = value;
-    }
-    return obj;
-  }
-  function _extends() {
-    _extends = Object.assign ? Object.assign.bind() : function (target) {
-      for (var i = 1; i < arguments.length; i++) {
-        var source = arguments[i];
-        for (var key in source) {
-          if (Object.prototype.hasOwnProperty.call(source, key)) {
-            target[key] = source[key];
-          }
-        }
-      }
-      return target;
-    };
-    return _extends.apply(this, arguments);
-  }
-  function _toPrimitive(input, hint) {
-    if (typeof input !== "object" || input === null) return input;
-    var prim = input[Symbol.toPrimitive];
-    if (prim !== undefined) {
-      var res = prim.call(input, hint || "default");
-      if (typeof res !== "object") return res;
+  function _toPrimitive(t, r) {
+    if ("object" != typeof t || !t) return t;
+    var e = t[Symbol.toPrimitive];
+    if (void 0 !== e) {
+      var i = e.call(t, r || "default");
+      if ("object" != typeof i) return i;
       throw new TypeError("@@toPrimitive must return a primitive value.");
     }
-    return (hint === "string" ? String : Number)(input);
+    return ("string" === r ? String : Number)(t);
   }
-  function _toPropertyKey(arg) {
-    var key = _toPrimitive(arg, "string");
-    return typeof key === "symbol" ? key : String(key);
+  function _toPropertyKey(t) {
+    var i = _toPrimitive(t, "string");
+    return "symbol" == typeof i ? i : i + "";
+  }
+  function _typeof(o) {
+    "@babel/helpers - typeof";
+
+    return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+      return typeof o;
+    } : function (o) {
+      return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
+    }, _typeof(o);
+  }
+  function _unsupportedIterableToArray(r, a) {
+    if (r) {
+      if ("string" == typeof r) return _arrayLikeToArray(r, a);
+      var t = {}.toString.call(r).slice(8, -1);
+      return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
+    }
   }
 
   /**
@@ -113,6 +127,9 @@
       self.$container = container;
       self.texts = texts || [];
       self.config = _objectSpread2(_objectSpread2({}, TagCloud._defaultConfig), options || {});
+
+      // process texts and calculate weight range
+      self._processTexts();
 
       // calculate config
       self.radius = self.config.radius; // rolling radius
@@ -138,7 +155,92 @@
 
     /* static method */
     // all TagCloud list
-    _createClass(TagCloud, [{
+    return _createClass(TagCloud, [{
+      key: "_calculateFontSize",
+      value:
+      // calculate font size based on weight
+      function _calculateFontSize(weight, minWeight, maxWeight) {
+        var self = this;
+        var _self$config = self.config,
+          minFontSize = _self$config.minFontSize,
+          maxFontSize = _self$config.maxFontSize;
+
+        // if min and max font size are the same, return the same size
+        if (minFontSize === maxFontSize) {
+          return minFontSize;
+        }
+
+        // if there's only one item or all weights are the same
+        if (minWeight === maxWeight) {
+          return minFontSize;
+        }
+
+        // calculate proportional font size
+        var ratio = (weight - minWeight) / (maxWeight - minWeight);
+        return minFontSize + (maxFontSize - minFontSize) * ratio;
+      }
+
+      // calculate color based on weight
+    }, {
+      key: "_getColorByWeight",
+      value: function _getColorByWeight(weight, minWeight, maxWeight) {
+        // normalize to [0, 1]
+        var ratio = (weight - minWeight) / (maxWeight - minWeight);
+
+        // handle edge cases
+        if (minWeight === maxWeight) {
+          ratio = 0.5; // use middle color for same weights
+        }
+
+        // color transition from cool to warm
+        // 240° (blue) → 180° (cyan) → 120° (green) → 60° (yellow) → 0° (red)
+        var hue = 240 - ratio * 240; // 240° to 0°
+        var saturation = 60 + ratio * 40; // 60% → 100%
+        var lightness = 65 - ratio * 30; // 65% → 35%
+
+        return "hsl(".concat(hue, ", ").concat(saturation, "%, ").concat(lightness, "%)");
+      }
+
+      // process texts data and calculate weight range
+    }, {
+      key: "_processTexts",
+      value: function _processTexts() {
+        var self = this;
+
+        // normalize texts to object format
+        self.processedTexts = self.texts.map(function (item) {
+          if (typeof item === 'string') {
+            return {
+              text: item,
+              pr: 0
+            }; // non-object types default to pr: 0
+          } else if (_typeof(item) === 'object' && item.text !== undefined) {
+            return {
+              text: item.text,
+              pr: item.pr !== undefined ? item.pr : 1
+            };
+          }
+          return {
+            text: String(item),
+            pr: 0
+          }; // non-object types default to pr: 0
+        });
+
+        // calculate weight range
+        if (self.processedTexts.length > 0) {
+          var weights = self.processedTexts.map(function (item) {
+            return item.pr;
+          });
+          self.minWeight = Math.min.apply(Math, _toConsumableArray(weights));
+          self.maxWeight = Math.max.apply(Math, _toConsumableArray(weights));
+        } else {
+          self.minWeight = 1;
+          self.maxWeight = 1;
+        }
+      }
+
+      // event listener
+    }, {
       key: "_createElment",
       value: /* instance property method */
       // create elment
@@ -156,8 +258,8 @@
 
         // create texts
         self.items = [];
-        self.texts.forEach(function (text, index) {
-          var item = self._createTextItem(text, index);
+        self.processedTexts.forEach(function (textObj, index) {
+          var item = self._createTextItem(textObj, index);
           $el.appendChild(item.el);
           self.items.push(item);
         });
@@ -168,11 +270,14 @@
       // create a text
     }, {
       key: "_createTextItem",
-      value: function _createTextItem(text) {
+      value: function _createTextItem(textObj) {
         var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
         var self = this;
         var itemEl = document.createElement('span');
         itemEl.className = self.config.itemClass;
+
+        // calculate font size based on weight
+        var fontSize = self._calculateFontSize(textObj.pr, self.minWeight, self.maxWeight);
         if (self.config.useItemInlineStyles) {
           itemEl.style.willChange = 'transform, opacity, filter';
           itemEl.style.position = 'absolute';
@@ -181,6 +286,13 @@
           itemEl.style.zIndex = index + 1;
           itemEl.style.filter = 'alpha(opacity=0)';
           itemEl.style.opacity = 0;
+          itemEl.style.fontSize = "".concat(fontSize, "px");
+
+          // apply color based on weight if hls is enabled
+          if (self.config.hls) {
+            var color = self._getColorByWeight(textObj.pr, self.minWeight, self.maxWeight);
+            itemEl.style.color = color;
+          }
           var transformOrigin = '50% 50%';
           itemEl.style.WebkitTransformOrigin = transformOrigin;
           itemEl.style.MozTransformOrigin = transformOrigin;
@@ -193,12 +305,13 @@
           itemEl.style.transform = transform;
         }
         if (self.config.useHTML) {
-          itemEl.innerHTML = text;
+          itemEl.innerHTML = textObj.text;
         } else {
-          itemEl.innerText = text;
+          itemEl.innerText = textObj.text;
         }
         return _objectSpread2({
-          el: itemEl
+          el: itemEl,
+          weight: textObj.pr
         }, self._computePosition(index));
       }
 
@@ -208,7 +321,7 @@
       value: function _computePosition(index) {
         var random = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
         var self = this;
-        var textsLength = self.texts.length;
+        var textsLength = self.processedTexts.length;
         // if random `true`, It means that a random appropriate place is generated, and the position will be independent of `index`
         if (random) index = Math.floor(Math.random() * (textsLength + 1));
         var phi = Math.acos(-1 + (2 * index + 1) / textsLength);
@@ -295,7 +408,6 @@
           self.mouseX = Math.abs(self.mouseX - self.mouseX0) < 1 ? self.mouseX0 : (self.mouseX + self.mouseX0) / 2; // reset distance between the mouse and rolling center x axis
           self.mouseY = Math.abs(self.mouseY - self.mouseY0) < 1 ? self.mouseY0 : (self.mouseY + self.mouseY0) / 2; // reset distance between the mouse and rolling center y axis
         }
-
         var a = -(Math.min(Math.max(-self.mouseY, -self.size), self.size) / self.radius) * self.maxSpeed;
         var b = Math.min(Math.max(-self.mouseX, -self.size), self.size) / self.radius * self.maxSpeed;
 
@@ -345,25 +457,40 @@
         var self = this;
         // params
         self.texts = texts || [];
+        // process new texts and recalculate weight range
+        self._processTexts();
+
         // judging and processing items based on texts
-        self.texts.forEach(function (text, index) {
+        self.processedTexts.forEach(function (textObj, index) {
           var item = self.items[index];
           if (!item) {
             // if not had, then create
-            item = self._createTextItem(text, index);
+            item = self._createTextItem(textObj, index);
             _extends(item, self._computePosition(index, true)); // random place
             self.$el.appendChild(item.el);
             self.items.push(item);
-          }
-          // if had, replace text
-          if (self.config.useHTML) {
-            item.el.innerHTML = text;
           } else {
-            item.el.innerText = text;
+            // if had, replace text and update font size
+            var fontSize = self._calculateFontSize(textObj.pr, self.minWeight, self.maxWeight);
+            if (self.config.useItemInlineStyles) {
+              item.el.style.fontSize = "".concat(fontSize, "px");
+
+              // apply color based on weight if hls is enabled
+              if (self.config.hls) {
+                var color = self._getColorByWeight(textObj.pr, self.minWeight, self.maxWeight);
+                item.el.style.color = color;
+              }
+            }
+            if (self.config.useHTML) {
+              item.el.innerHTML = textObj.text;
+            } else {
+              item.el.innerText = textObj.text;
+            }
+            item.weight = textObj.pr;
           }
         });
         // remove redundant self.items
-        var textsLength = self.texts.length;
+        var textsLength = self.processedTexts.length;
         var itemsLength = self.items.length;
         if (textsLength < itemsLength) {
           var removeList = self.items.splice(textsLength, itemsLength - textsLength);
@@ -403,9 +530,7 @@
       }
     }], [{
       key: "_on",
-      value:
-      // event listener
-      function _on(el, ev, handler, cap) {
+      value: function _on(el, ev, handler, cap) {
         if (el.addEventListener) {
           el.addEventListener(ev, handler, cap);
         } else if (el.attachEvent) {
@@ -415,7 +540,6 @@
         }
       }
     }]);
-    return TagCloud;
   }();
   TagCloud.list = [];
   // default config
@@ -435,7 +559,12 @@
     useItemInlineStyles: true,
     containerClass: 'tagcloud',
     itemClass: 'tagcloud--item',
-    useHTML: false
+    useHTML: false,
+    minFontSize: 12,
+    // minimum font size in px
+    maxFontSize: 12,
+    // maximum font size in px
+    hls: false // whether to use HSL color based on weight
   };
   // speed value
   TagCloud._getMaxSpeed = function (name) {

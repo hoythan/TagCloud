@@ -18,6 +18,10 @@
   它是随着鼠标滚动的3D<strong>标签云</strong>，只有6kb大小，不依赖任何其他类库。 <a href="http://tagcloud.congm.in/examples">例子</a>
 </p>
 
+<p align="center">
+  ✨ <strong>新功能</strong>：基于权重的字体大小、HSL颜色渐变（冷色到暖色）、对象格式支持
+</p>
+
 - [如何使用](#如何使用)
   - [npm](#npm)
   - [浏览器](#浏览器)

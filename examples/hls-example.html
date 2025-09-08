@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TagCloud HLS 颜色功能演示</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .demo {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .demo:hover {
+            transform: translateY(-5px);
+        }
+
+        .demo h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.3em;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .tagcloud {
+            border-radius: 10px;
+            background: #fafafa;
+            border: 1px solid #eee;
+        }
+
+        .tagcloud--item {
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .tagcloud--item:hover {
+            filter: brightness(1.2) drop-shadow(0 0 8px currentColor);
+        }
+
+        .controls {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .controls h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            margin: 15px 0;
+        }
+
+        .control-group label {
+            display: inline-block;
+            width: 120px;
+            text-align: right;
+            margin-right: 10px;
+            color: #555;
+        }
+
+        .control-group button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: background 0.3s;
+        }
+
+        .control-group button:hover {
+            background: #5a6fd8;
+        }
+
+        .control-group button.active {
+            background: #764ba2;
+        }
+
+        .info {
+            background: #e8f4f8;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .info h4 {
+            margin: 0 0 10px 0;
+            color: #1976D2;
+        }
+
+        .info p {
+            margin: 5px 0;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎨 TagCloud HLS 颜色功能</h1>
+        <p>根据权重自动调整标签颜色的3D标签云</p>
+    </div>
+
+    <div class="controls">
+        <h3>⚙️ 实时控制</h3>
+        <div class="control-group">
+            <label>颜色模式:</label>
+            <button id="toggleHls" class="active">HLS 颜色</button>
+            <button id="toggleNormal">普通模式</button>
+        </div>
+        <div class="control-group">
+            <label>字体大小:</label>
+            <button id="sameSize">相同大小</button>
+            <button id="diffSize" class="active">权重大小</button>
+        </div>
+        <div class="control-group">
+            <label>数据更新:</label>
+            <button id="updateData">更新数据</button>
+            <button id="resetData">重置数据</button>
+        </div>
+    </div>
+
+    <div class="info">
+        <h4>📋 功能说明</h4>
+        <p><strong>HLS 颜色模式：</strong>根据权重值自动计算HSL颜色，从冷色到暖色渐变</p>
+        <p><strong>权重规则：</strong>对象格式可设置 pr 值，字符串格式默认 pr = 0</p>
+        <p><strong>颜色算法：</strong>蓝色(240°)→青色→绿色→黄色→红色(0°)，饱和度60%→100%，亮度65%→35%</p>
+    </div>
+
+    <div class="container">
+        <div class="demo">
+            <h3>🔤 混合数据类型演示</h3>
+            <p>字符串 + 对象混合，展示默认权重差异</p>
+            <div id="tagcloud1"></div>
+        </div>
+
+        <div class="demo">
+            <h3>📊 权重梯度演示</h3>
+            <p>从低权重到高权重的颜色渐变</p>
+            <div id="tagcloud2"></div>
+        </div>
+
+        <div class="demo">
+            <h3>🎯 技术栈演示</h3>
+            <p>真实技术标签的权重分布</p>
+            <div id="tagcloud3"></div>
+        </div>
+
+        <div class="demo">
+            <h3>🌈 彩虹权重演示</h3>
+            <p>大范围权重值的颜色表现</p>
+            <div id="tagcloud4"></div>
+        </div>
+    </div>
+
+    <script src="../dist/TagCloud.js"></script>
+    <script>
+        // 全局变量存储标签云实例
+        let tagClouds = [];
+        let currentHls = true;
+        let currentSameSize = false;
+
+        // 数据集
+        const datasets = {
+            mixed: [
+                'HTML', // 字符串，默认 pr = 0
+                'CSS',  // 字符串，默认 pr = 0
+                {text: 'JavaScript', pr: 8},
+                {text: 'TypeScript', pr: 6},
+                {text: 'React', pr: 9},
+                'Vue'   // 字符串，默认 pr = 0
+            ],
+
+            gradient: [
+                {text: '权重1', pr: 1},
+                {text: '权重2', pr: 2},
+                {text: '权重3', pr: 3},
+                {text: '权重4', pr: 4},
+                {text: '权重5', pr: 5},
+                {text: '权重6', pr: 6},
+                {text: '权重7', pr: 7},
+                {text: '权重8', pr: 8}
+            ],
+
+            tech: [
+                {text: 'React', pr: 95},
+                {text: 'Vue', pr: 85},
+                {text: 'Angular', pr: 70},
+                {text: 'JavaScript', pr: 98},
+                {text: 'TypeScript', pr: 88},
+                {text: 'Node.js', pr: 82},
+                {text: 'Express', pr: 75},
+                {text: 'MongoDB', pr: 65},
+                {text: 'PostgreSQL', pr: 72},
+                {text: 'Docker', pr: 80},
+                {text: 'AWS', pr: 78},
+                {text: 'Git', pr: 92}
+            ],
+
+            rainbow: [
+                {text: 'Ultra Low', pr: 1},
+                {text: 'Very Low', pr: 10},
+                {text: 'Low', pr: 25},
+                {text: 'Medium Low', pr: 40},
+                {text: 'Medium', pr: 50},
+                {text: 'Medium High', pr: 60},
+                {text: 'High', pr: 75},
+                {text: 'Very High', pr: 90},
+                {text: 'Ultra High', pr: 100}
+            ]
+        };
+
+        // 初始化标签云
+        function initTagClouds() {
+            const configs = [
+                { data: datasets.mixed, container: '#tagcloud1' },
+                { data: datasets.gradient, container: '#tagcloud2' },
+                { data: datasets.tech, container: '#tagcloud3' },
+                { data: datasets.rainbow, container: '#tagcloud4' }
+            ];
+
+            tagClouds = configs.map(config => {
+                return TagCloud(config.container, config.data, {
+                    radius: 150,
+                    maxSpeed: 'normal',
+                    initSpeed: 'normal',
+                    direction: 135,
+                    keep: true,
+                    hls: currentHls,
+                    minFontSize: currentSameSize ? 14 : 12,
+                    maxFontSize: currentSameSize ? 14 : 20
+                });
+            });
+        }
+
+        // 更新所有标签云的配置
+        function updateAllConfigs() {
+            tagClouds.forEach(cloud => {
+                if (cloud && cloud.config) {
+                    cloud.config.hls = currentHls;
+                    cloud.config.minFontSize = currentSameSize ? 14 : 12;
+                    cloud.config.maxFontSize = currentSameSize ? 14 : 20;
+
+                    // 重新处理文本以应用新配置
+                    cloud._processTexts();
+
+                    // 更新每个项目的样式
+                    cloud.items.forEach((item, index) => {
+                        const textObj = cloud.processedTexts[index];
+                        if (textObj && cloud.config.useItemInlineStyles) {
+                            const fontSize = cloud._calculateFontSize(
+                                textObj.pr, cloud.minWeight, cloud.maxWeight
+                            );
+                            item.el.style.fontSize = `${fontSize}px`;
+
+                            if (cloud.config.hls) {
+                                const color = cloud._getColorByWeight(
+                                    textObj.pr, cloud.minWeight, cloud.maxWeight
+                                );
+                                item.el.style.color = color;
+                            } else {
+                                item.el.style.color = ''; // 重置为默认颜色
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        // 控制按钮事件
+        document.getElementById('toggleHls').addEventListener('click', function() {
+            currentHls = true;
+            updateButtons();
+            updateAllConfigs();
+        });
+
+        document.getElementById('toggleNormal').addEventListener('click', function() {
+            currentHls = false;
+            updateButtons();
+            updateAllConfigs();
+        });
+
+        document.getElementById('sameSize').addEventListener('click', function() {
+            currentSameSize = true;
+            updateButtons();
+            updateAllConfigs();
+        });
+
+        document.getElementById('diffSize').addEventListener('click', function() {
+            currentSameSize = false;
+            updateButtons();
+            updateAllConfigs();
+        });
+
+        document.getElementById('updateData').addEventListener('click', function() {
+            // 随机更新第三个标签云的数据
+            const newTechData = [
+                {text: 'Svelte', pr: 75},
+                {text: 'Next.js', pr: 88},
+                {text: 'Nuxt.js', pr: 78},
+                {text: 'Vite', pr: 82},
+                {text: 'Webpack', pr: 70},
+                {text: 'ESLint', pr: 65},
+                {text: 'Prettier', pr: 68},
+                {text: 'Jest', pr: 72}
+            ];
+
+            if (tagClouds[2]) {
+                tagClouds[2].update(newTechData);
+            }
+        });
+
+        document.getElementById('resetData').addEventListener('click', function() {
+            if (tagClouds[2]) {
+                tagClouds[2].update(datasets.tech);
+            }
+        });
+
+        // 更新按钮状态
+        function updateButtons() {
+            // HLS 按钮
+            document.getElementById('toggleHls').className = currentHls ? 'active' : '';
+            document.getElementById('toggleNormal').className = currentHls ? '' : 'active';
+
+            // 字体大小按钮
+            document.getElementById('sameSize').className = currentSameSize ? 'active' : '';
+            document.getElementById('diffSize').className = currentSameSize ? '' : 'active';
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initTagClouds();
+            updateButtons();
+
+            // 添加一些动态效果
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // 页面样式初始化
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.5s ease-in-out';
+    </script>
+</body>
+</html>

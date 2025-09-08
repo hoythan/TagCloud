@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TagCloud 权重测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+        .demo {
+            text-align: center;
+        }
+        .demo h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .tagcloud {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .tagcloud--item {
+            color: #666;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .tagcloud--item:hover {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center; color: #333; margin-bottom: 40px;">TagCloud 权重功能测试</h1>
+
+    <div class="container">
+        <div class="demo">
+            <h3>字符串格式（兼容性测试）</h3>
+            <div id="tagcloud1"></div>
+        </div>
+
+        <div class="demo">
+            <h3>对象格式（相同字体大小）</h3>
+            <div id="tagcloud2"></div>
+        </div>
+
+        <div class="demo">
+            <h3>对象格式（不同权重字体大小）</h3>
+            <div id="tagcloud3"></div>
+        </div>
+    </div>
+
+    <script src="../dist/TagCloud.js"></script>
+    <script>
+        // 测试1：字符串格式（向后兼容）
+        const texts1 = ['HTML', 'CSS', 'JavaScript', 'React', 'Vue', 'Angular', 'Node.js', 'Python'];
+        TagCloud('#tagcloud1', texts1, {
+            radius: 120,
+            maxSpeed: 'normal',
+            initSpeed: 'normal',
+            minFontSize: 14,
+            maxFontSize: 14
+        });
+
+        // 测试2：对象格式，相同字体大小
+        const texts2 = [
+            {text: 'HTML', pr: 1},
+            {text: 'CSS', pr: 5},
+            {text: 'JavaScript', pr: 10},
+            {text: 'React', pr: 8},
+            {text: 'Vue', pr: 6},
+            {text: 'Angular', pr: 4}
+        ];
+        TagCloud('#tagcloud2', texts2, {
+            radius: 120,
+            maxSpeed: 'normal',
+            initSpeed: 'normal',
+            minFontSize: 16,
+            maxFontSize: 16
+        });
+
+        // 测试3：对象格式，不同权重字体大小
+        const texts3 = [
+            {text: 'HTML', pr: 1},
+            {text: 'CSS', pr: 3},
+            {text: 'JavaScript', pr: 10},
+            {text: 'React', pr: 8},
+            {text: 'Vue', pr: 6},
+            {text: 'Angular', pr: 4},
+            {text: 'Node.js', pr: 7},
+            {text: 'Python', pr: 5},
+            {text: 'TypeScript', pr: 9},
+            {text: 'Webpack', pr: 2}
+        ];
+        TagCloud('#tagcloud3', texts3, {
+            radius: 120,
+            maxSpeed: 'normal',
+            initSpeed: 'normal',
+            minFontSize: 12,
+            maxFontSize: 24
+        });
+
+        // 5秒后更新第三个标签云，测试update方法
+        setTimeout(() => {
+            const newTexts = [
+                {text: 'React', pr: 10},
+                {text: 'Vue', pr: 9},
+                {text: 'Angular', pr: 7},
+                {text: 'Svelte', pr: 6},
+                {text: 'Next.js', pr: 8},
+                {text: 'Nuxt.js', pr: 5}
+            ];
+            TagCloud.list[2].instance.update(newTexts);
+        }, 5000);
+    </script>
+</body>
+</html>

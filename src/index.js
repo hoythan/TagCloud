@@ -14,6 +14,9 @@ class TagCloud {
         self.texts = texts || [];
         self.config = { ...TagCloud._defaultConfig, ...options || {} };
 
+        // process texts and calculate weight range
+        self._processTexts();
+
         // calculate config
         self.radius = self.config.radius; // rolling radius
         self.depth = 2 * self.radius; // rolling depth
@@ -49,12 +52,79 @@ class TagCloud {
         containerClass: 'tagcloud',
         itemClass: 'tagcloud--item',
         useHTML: false,
+        minFontSize: 12, // minimum font size in px
+        maxFontSize: 12, // maximum font size in px
+        hls: false, // whether to use HSL color based on weight
     };
 
     // speed value
     static _getMaxSpeed = (name) => ({ slow: 0.5, normal: 1, fast: 2 })[name] || 1;
 
     static _getInitSpeed = (name) => ({ slow: 16, normal: 32, fast: 80 })[name] || 32;
+
+    // calculate font size based on weight
+    _calculateFontSize(weight, minWeight, maxWeight) {
+        const self = this;
+        const { minFontSize, maxFontSize } = self.config;
+
+        // if min and max font size are the same, return the same size
+        if (minFontSize === maxFontSize) {
+            return minFontSize;
+        }
+
+        // if there's only one item or all weights are the same
+        if (minWeight === maxWeight) {
+            return minFontSize;
+        }
+
+        // calculate proportional font size
+        const ratio = (weight - minWeight) / (maxWeight - minWeight);
+        return minFontSize + (maxFontSize - minFontSize) * ratio;
+    }
+
+    // calculate color based on weight
+    _getColorByWeight(weight, minWeight, maxWeight) {
+        // normalize to [0, 1]
+        let ratio = (weight - minWeight) / (maxWeight - minWeight);
+
+        // handle edge cases
+        if (minWeight === maxWeight) {
+            ratio = 0.5; // use middle color for same weights
+        }
+
+        // color transition from cool to warm
+        // 240° (blue) → 180° (cyan) → 120° (green) → 60° (yellow) → 0° (red)
+        const hue = 240 - ratio * 240; // 240° to 0°
+        const saturation = 60 + ratio * 40; // 60% → 100%
+        const lightness = 65 - ratio * 30; // 65% → 35%
+
+        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+
+    // process texts data and calculate weight range
+    _processTexts() {
+        const self = this;
+
+        // normalize texts to object format
+        self.processedTexts = self.texts.map(item => {
+            if (typeof item === 'string') {
+                return { text: item, pr: 0 }; // non-object types default to pr: 0
+            } else if (typeof item === 'object' && item.text !== undefined) {
+                return { text: item.text, pr: item.pr !== undefined ? item.pr : 1 };
+            }
+            return { text: String(item), pr: 0 }; // non-object types default to pr: 0
+        });
+
+        // calculate weight range
+        if (self.processedTexts.length > 0) {
+            const weights = self.processedTexts.map(item => item.pr);
+            self.minWeight = Math.min(...weights);
+            self.maxWeight = Math.max(...weights);
+        } else {
+            self.minWeight = 1;
+            self.maxWeight = 1;
+        }
+    }
 
     // event listener
     static _on(el, ev, handler, cap) {
@@ -83,8 +153,8 @@ class TagCloud {
 
         // create texts
         self.items = [];
-        self.texts.forEach((text, index) => {
-            const item = self._createTextItem(text, index);
+        self.processedTexts.forEach((textObj, index) => {
+            const item = self._createTextItem(textObj, index);
             $el.appendChild(item.el);
             self.items.push(item);
         });
@@ -93,10 +163,14 @@ class TagCloud {
     }
 
     // create a text
-    _createTextItem(text, index = 0) {
+    _createTextItem(textObj, index = 0) {
         const self = this;
         const itemEl = document.createElement('span');
         itemEl.className = self.config.itemClass;
+
+        // calculate font size based on weight
+        const fontSize = self._calculateFontSize(textObj.pr, self.minWeight, self.maxWeight);
+
         if (self.config.useItemInlineStyles) {
             itemEl.style.willChange = 'transform, opacity, filter';
             itemEl.style.position = 'absolute';
@@ -105,6 +179,13 @@ class TagCloud {
             itemEl.style.zIndex = index + 1;
             itemEl.style.filter = 'alpha(opacity=0)';
             itemEl.style.opacity = 0;
+            itemEl.style.fontSize = `${fontSize}px`;
+
+            // apply color based on weight if hls is enabled
+            if (self.config.hls) {
+                const color = self._getColorByWeight(textObj.pr, self.minWeight, self.maxWeight);
+                itemEl.style.color = color;
+            }
             const transformOrigin = '50% 50%';
             itemEl.style.WebkitTransformOrigin = transformOrigin;
             itemEl.style.MozTransformOrigin = transformOrigin;
@@ -117,12 +198,13 @@ class TagCloud {
             itemEl.style.transform = transform;
         }
         if (self.config.useHTML) {
-            itemEl.innerHTML = text;
+            itemEl.innerHTML = textObj.text;
         } else {
-            itemEl.innerText = text;
+            itemEl.innerText = textObj.text;
         }
         return {
             el: itemEl,
+            weight: textObj.pr,
             ...self._computePosition(index), // distributed in appropriate place
         };
     }
@@ -130,7 +212,7 @@ class TagCloud {
     // calculate appropriate place
     _computePosition(index, random = false) {
         const self = this;
-        const textsLength = self.texts.length;
+        const textsLength = self.processedTexts.length;
         // if random `true`, It means that a random appropriate place is generated, and the position will be independent of `index`
         if (random) index = Math.floor(Math.random() * (textsLength + 1));
         const phi = Math.acos(-1 + (2 * index + 1) / textsLength);
@@ -221,7 +303,7 @@ class TagCloud {
             a = -a;
             b = -b;
         }
-        
+
         if (Math.abs(a) <= 0.01 && Math.abs(b) <= 0.01) return; // pause
 
         // calculate offset
@@ -270,24 +352,43 @@ class TagCloud {
         const self = this;
         // params
         self.texts = texts || [];
+        // process new texts and recalculate weight range
+        self._processTexts();
+
         // judging and processing items based on texts
-        self.texts.forEach((text, index) => {
+        self.processedTexts.forEach((textObj, index) => {
             let item = self.items[index];
             if (!item) { // if not had, then create
-                item = self._createTextItem(text, index);
+                item = self._createTextItem(textObj, index);
                 Object.assign(item, self._computePosition(index, true)); // random place
                 self.$el.appendChild(item.el);
                 self.items.push(item);
-            }
-            // if had, replace text
-            if (self.config.useHTML) {
-                item.el.innerHTML = text;
             } else {
-                item.el.innerText = text;
+                // if had, replace text and update font size
+                const fontSize = self._calculateFontSize(
+                    textObj.pr, self.minWeight, self.maxWeight
+                );
+                if (self.config.useItemInlineStyles) {
+                    item.el.style.fontSize = `${fontSize}px`;
+
+                    // apply color based on weight if hls is enabled
+                    if (self.config.hls) {
+                        const color = self._getColorByWeight(
+                            textObj.pr, self.minWeight, self.maxWeight
+                        );
+                        item.el.style.color = color;
+                    }
+                }
+                if (self.config.useHTML) {
+                    item.el.innerHTML = textObj.text;
+                } else {
+                    item.el.innerText = textObj.text;
+                }
+                item.weight = textObj.pr;
             }
         });
         // remove redundant self.items
-        const textsLength = self.texts.length;
+        const textsLength = self.processedTexts.length;
         const itemsLength = self.items.length;
         if (textsLength < itemsLength) {
             const removeList = self.items.splice(textsLength, itemsLength - textsLength);
