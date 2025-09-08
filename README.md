@@ -4,12 +4,12 @@
   <img alt="TagCloud" src="https://raw.githubusercontent.com/mcc108/TagCloud/master/examples/tagcloud.gif" width="200">
 </p>
 
-<h1 align="center">TagCloud.js</h1>
+<h1 align="center">TagCloud-HLS</h1>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/TagCloud"><img alt="npm" src="https://img.shields.io/npm/v/TagCloud.svg?style=flat-square"></a>
-  <a href="https://github.com/mcc108/TagCloud/tree/master/dist"><img alt="minsize" src="https://img.shields.io/bundlephobia/min/TagCloud?label=TagCloud&style=flat-square"></a>
-  <a href="https://www.npmjs.com/package/TagCloud"><img alt="downloads" src="https://img.shields.io/npm/dt/TagCloud?style=flat-square"></a>
+  <a href="https://www.npmjs.com/package/tagcloud-hls"><img alt="npm" src="https://img.shields.io/npm/v/tagcloud-hls.svg?style=flat-square"></a>
+  <a href="https://github.com/hoyt/tagcloud-hls/tree/master/dist"><img alt="minsize" src="https://img.shields.io/bundlephobia/min/tagcloud-hls?label=tagcloud-hls&style=flat-square"></a>
+  <a href="https://www.npmjs.com/package/tagcloud-hls"><img alt="downloads" src="https://img.shields.io/npm/dt/tagcloud-hls?style=flat-square"></a>
 </p>
 
 <p align="center">
@@ -59,11 +59,13 @@
 ### npm
 
 ```bash
-$ npm i -S TagCloud
+$ npm i -S tagcloud-hls
 ```
 
 ```js
-const TagCloud = require('TagCloud');
+const TagCloud = require('tagcloud-hls');
+// Or use ES6 modules
+import TagCloud from 'tagcloud-hls';
 
 const container = '.tagcloud';
 
@@ -113,7 +115,25 @@ TagCloud(container, textsWithWeights, options);
 ```
 
 ```js
+// Basic usage
+const container = '.tagcloud';
+const texts = ['HTML', 'CSS', 'JavaScript', 'React', 'Vue'];
+const options = {
+    hls: true,        // Enable HSL color gradients
+    minFontSize: 14,
+    maxFontSize: 20,
+};
+
 TagCloud(container, texts, options);
+
+// With weight support
+const textsWithWeight = [
+    { text: 'React', pr: 5 },
+    { text: 'Vue', pr: 4 },
+    { text: 'Angular', pr: 3 },
+    { text: 'jQuery', pr: 2 },
+];
+TagCloud(container, textsWithWeight, options);
 ```
 
 ### React

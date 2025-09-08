@@ -1,7 +1,7 @@
 {
-  "name": "TagCloud",
-  "version": "2.5.0",
-  "description": "3D TagCloud",
+  "name": "tagcloud-hls",
+  "version": "1.0.1",
+  "description": "3D TagCloud with HLS color support - A 3D interactive tag cloud library with weight-based font sizing and HSL color gradients",
   "main": "dist/TagCloud.js",
   "types": "dist/TagCloud.d.ts",
   "files": [
@@ -17,13 +17,26 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/cong-min/TagCloud.git"
+    "url": "git+https://github.com/hoyt/tagcloud-hls.git"
   },
-  "author": "Cong Min",
+  "author": "Hoyt",
   "license": "MIT",
+  "homepage": "https://github.com/hoyt/tagcloud-hls#readme",
   "bugs": {
-    "url": "https://github.com/cong-min/TagCloud/issues"
+    "url": "https://github.com/hoyt/tagcloud-hls/issues"
   },
+  "keywords": [
+    "tagcloud",
+    "3d",
+    "interactive",
+    "animation",
+    "hsl",
+    "color",
+    "weight",
+    "javascript",
+    "sphere",
+    "rolling"
+  ],
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.5.5",
